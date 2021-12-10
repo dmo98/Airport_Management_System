@@ -1,0 +1,895 @@
+CREATE TABLE airport(
+    airport_name VARCHAR(60) PRIMARY KEY,
+    city VARCHAR(20),
+    state VARCHAR(20),
+    gm_ssn VARCHAR(11)
+);
+
+CREATE TABLE employee(
+    ssn VARCHAR(11) PRIMARY KEY,
+    Fname VARCHAR(20),
+    M VARCHAR(1),
+    Lname VARCHAR(20),
+    phone_number VARCHAR(12),
+    sex VARCHAR(1),
+    age INT,
+    address VARCHAR(100),
+    salary INT,
+    jobtype VARCHAR(20),
+    airport VARCHAR(60),
+    FOREIGN KEY(airport) REFERENCES airport(airport_name) ON DELETE SET NULL
+);
+
+ALTER TABLE airport
+ADD FOREIGN KEY(gm_ssn)
+REFERENCES employee(ssn)
+ON DELETE SET NULL;
+
+DESCRIBE airport;
+DESCRIBE employee;
+
+CREATE TABLE flight(
+    flightID VARCHAR(10) PRIMARY KEY,
+    airline VARCHAR(30),
+    d_airport VARCHAR(60),
+    d_time TIMESTAMP,
+    d_gate VARCHAR(5),
+    a_airport VARCHAR(60),
+    a_time TIMESTAMP,
+    a_gate VARCHAR(5),
+    aircraft_sno INT,
+    FOREIGN KEY(d_airport) REFERENCES airport(airport_name) ON DELETE SET NULL,
+    FOREIGN KEY(a_airport) REFERENCES airport(airport_name) ON DELETE SET NULL
+);
+
+CREATE TABLE flight_crew(
+    passport_number VARCHAR(9) PRIMARY KEY,
+    name_ VARCHAR(30),
+    yrs_exp INT,
+    age INT,
+    sex VARCHAR(1),
+    jobtype VARCHAR(20)
+);
+
+DESCRIBE flight_crew;
+
+CREATE TABLE aircraft(
+    sno INT PRIMARY KEY,
+    model VARCHAR(10),
+    capacity INT,
+    date_of_manufacture DATE
+);
+
+DESCRIBE aircraft;
+
+ALTER TABLE flight
+ADD FOREIGN KEY(aircraft_sno)
+REFERENCES aircraft(sno)
+ON DELETE SET NULL;
+
+DESCRIBE flight;
+
+CREATE TABLE hangar(
+    airport_name VARCHAR(60),
+    hangarID INT,
+    location VARCHAR(20),
+    PRIMARY KEY(airport_name, hangarID),
+    FOREIGN KEY(airport_name) REFERENCES airport(airport_name) ON DELETE CASCADE
+);
+
+DESCRIBE hangar;
+
+CREATE TABLE crew(
+    flightID VARCHAR(10),
+    passport_number VARCHAR(9),
+    PRIMARY KEY(flightID, passport_number),
+    FOREIGN KEY(flightID) REFERENCES flight(flightID) ON DELETE CASCADE,
+    FOREIGN KEY(passport_number) REFERENCES flight_crew(passport_number) ON DELETE CASCADE
+);
+
+DESCRIBE crew;
+
+-- not used
+CREATE TABLE kept_in(
+    airport_name VARCHAR(60),
+    hangarID INT,
+    aircraft_sno INT,
+    PRIMARY KEY(airport_name, hangarID, aircraft_sno),
+    FOREIGN KEY(airport_name, hangarID) REFERENCES hangar(airport_name, hangarID) ON DELETE CASCADE,
+    FOREIGN KEY(aircraft_sno) REFERENCES aircraft(sno) ON DELETE CASCADE
+);
+
+DESCRIBE kept_in;
+
+CREATE TABLE undergoes_maintenance(
+    airport_name VARCHAR(60),
+    hangarID INT,
+    aircraft_sno INT,
+    maintenance_type VARCHAR(30),
+    date DATE,
+    PRIMARY KEY(airport_name, hangarID, aircraft_sno),
+    FOREIGN KEY(airport_name, hangarID) REFERENCES hangar(airport_name, hangarID) ON DELETE CASCADE,
+    FOREIGN KEY(aircraft_sno) REFERENCES aircraft(sno) ON DELETE CASCADE
+);
+
+DESCRIBE undergoes_maintenance;
+
+CREATE TABLE works_at(
+    airport_name VARCHAR(60),
+    hangarID INT,
+    emp_ssn VARCHAR(11),
+    PRIMARY KEY(airport_name, hangarID, emp_ssn),
+    FOREIGN KEY(airport_name, hangarID) REFERENCES hangar(airport_name, hangarID) ON DELETE CASCADE,
+    FOREIGN KEY(emp_ssn) REFERENCES employee(ssn) ON DELETE CASCADE
+);
+
+DESCRIBE works_at;
+
+CREATE TABLE specialize_in(
+    emp_ssn VARCHAR(11) PRIMARY KEY,
+    model VARCHAR(10),
+    FOREIGN KEY(emp_ssn) REFERENCES employee(ssn) ON DELETE CASCADE
+);
+
+DESCRIBE specialize_in;
+
+--------------------------------------------------------------------------
+
+-- populate airport table
+INSERT INTO airport VALUES("O'Hare International Airport", 'Chicago', 'Illinois', NULL);
+INSERT INTO airport VALUES("Hartsfield-Jackson Atlanta International Airport", 'Atlanta', 'Georgia', NULL);
+INSERT INTO airport VALUES("John F. Kennedy International Airport", 'New York City', 'New York', NULL);
+INSERT INTO airport VALUES("Los Angeles International Airport", 'Los Angeles', 'California', NULL);
+
+DELETE FROM airport WHERE airport_name = 'Los Angeles International Airport';
+
+
+-- populate employee table with the general managers
+INSERT INTO employee VALUES('123-45-6789', 'Michael','J','Smith','204-888-0632','M',50,'4022 Shingleton Road, Des Plaines, IL, 60018',150000,'Manager',"O'Hare International Airport");
+INSERT INTO employee VALUES('987-65-4321', 'Frank','D','James','204-564-2378','M',45,'3539 Hillview Drive, Atlanta, GA, 30308',125000,'Manager',"Hartsfield-Jackson Atlanta International Airport");
+INSERT INTO employee VALUES('456-37-2890', 'James','M','Johnson','204-504-9389','M',50,'1418 Stanley Avenue, New York, NY, 10014',175000,'Manager',"John F. Kennedy International Airport");
+
+UPDATE airport
+SET gm_ssn = '123-45-6789'
+WHERE airport_name = "O'Hare International Airport";
+
+UPDATE airport 
+SET gm_ssn = '987-65-4321'
+WHERE airport_name = "Hartsfield-Jackson Atlanta International Airport";
+
+UPDATE airport 
+SET gm_ssn = '456-37-2890'
+WHERE airport_name = "John F. Kennedy International Airport";
+
+
+SELECT * FROM airport;
+SELECT * FROM employee;
+
+-- populate employee table with Customer Service employees
+INSERT INTO employee VALUES('876-23-4758', 'Marsha', 'D', 'Grisham', '773-425-0584','F',35,'860 Oakmound Road, Chicago, IL, 60018',75000,'Customer Service',"O'Hare International Airport");
+INSERT INTO employee VALUES('330-24-4930', 'Latonia', 'W', 'Hodge', '773-623-0384','F',49,'4188 Cecil Street, Chicago, IL, 60607',73000,'Customer Service',"O'Hare International Airport");
+INSERT INTO employee VALUES('532-88-3657', 'Susan', 'E', 'Porter', '708-543-5164','F',27,'1612 Sun Valley Road, Chicago, IL, 60290',65000,'Customer Service',"O'Hare International Airport");
+INSERT INTO employee VALUES('360-78-6879', 'Kathleen', 'H', 'Duprey', '773-964-4633','F',31,'2935 Victoria Street, Chicago, IL, 60631',78000,'Customer Service',"O'Hare International Airport");
+INSERT INTO employee VALUES('390-87-5247', 'Darlene', 'M', 'Graham', '402-384-5689','F',55,'419 Cheshire Road, Atlanta, GA, 30340',85000,'Customer Service',"Hartsfield-Jackson Atlanta International Airport");
+INSERT INTO employee VALUES('536-08-3331', 'Agnes', 'G', 'Boyer', '402-890-5463','F',39,'3272 Chardonnay Drive, Atlanta, GA, 30318',69000,'Customer Service',"Hartsfield-Jackson Atlanta International Airport");
+INSERT INTO employee VALUES('258-54-6726', 'Rosie', 'S', 'Cunningham', '404-621-9889','F',45,'3293 Musgrave Street, Atlanta, GA, 30312',85000,'Customer Service',"Hartsfield-Jackson Atlanta International Airport");
+INSERT INTO employee VALUES('671-07-3134', 'Fredrick', 'S', 'Folse', '404-312-5446','M',48,'683 Clement Street, Atlanta, GA, 30318',75000,'Customer Service',"Hartsfield-Jackson Atlanta International Airport");
+INSERT INTO employee VALUES('055-70-5755', 'Joseph', 'J', 'Ford', '917-569-6185','M',55,'354 Hoffman Avenue, New York, NY, 10013',90000,'Customer Service',"John F. Kennedy International Airport");
+INSERT INTO employee VALUES('053-44-0035', 'Margaret', 'R', 'Carillo', '646-417-5852','F',43,'1270 Oakwood Avenue, New York, NY, 10022',87000,'Customer Service',"John F. Kennedy International Airport");
+INSERT INTO employee VALUES('549-27-1913', 'Carlo', 'J', 'Davis', '917-859-5764','M',33,'1158 Williams Avenue, New York, NY, 10001',78000,'Customer Service',"John F. Kennedy International Airport");
+INSERT INTO employee VALUES('061-20-3172', 'Cynthia', 'T', 'Call', '917-847-1189','F',25,'3210 My Drive, New York, NY, 10013',90000,'Customer Service',"John F. Kennedy International Airport");
+
+-- populate employee table with ground level workers
+INSERT INTO employee VALUES('568-61-6837', 'Isaac', 'J', 'Campbell', '773-519-3921','M',45,'942 Evergreen Lane, Chicago, IL, 60290',65000,'Ground Level',"O'Hare International Airport");
+INSERT INTO employee VALUES('337-86-4292', 'David', 'I', 'Gleason', '773-426-6392','M',39,'1421 Johnstown Road, Chicago, IL, 60607',63000,'Ground Level',"O'Hare International Airport");
+INSERT INTO employee VALUES('354-12-8353', 'Iris', 'M', 'Hancock', '773-879-0023','F',37,'1163 Poplar Street, Chicago, IL, 60606',61000,'Ground Level',"O'Hare International Airport");
+INSERT INTO employee VALUES('335-28-1206', 'Sarah', 'D', 'Beaulieu', '773-206-3272','F',31,'3360 University Drive, Chicago, IL, 60606',54000,'Ground Level',"O'Hare International Airport");
+INSERT INTO employee VALUES('667-28-1080', 'Oren', 'K', 'Warren', '762-207-3373','M',45,'1635 Flint Street, Atlanta, GA, 30303',75000,'Ground Level',"Hartsfield-Jackson Atlanta International Airport");
+INSERT INTO employee VALUES('673-20-4106', 'Michele', 'F', 'Mallory', '404-514-3999','F',29,'4641 College Street, Atlanta, GA, 30303',64000,'Ground Level',"Hartsfield-Jackson Atlanta International Airport");
+INSERT INTO employee VALUES('387-76-2842', 'Donna', 'M', 'Ramirez', '678-770-7254','F',35,'3678 Irish Lane, Atlanta, GA, 30301',65000,'Ground Level',"Hartsfield-Jackson Atlanta International Airport");
+INSERT INTO employee VALUES('668-28-0486', 'Lea', 'H', 'Peele', '770-639-5484','F',28,'2907 Junior Avenue, Atlanta, GA, 30305',72000,'Ground Level',"Hartsfield-Jackson Atlanta International Airport");
+INSERT INTO employee VALUES('076-24-0014', 'Tracey', 'J', 'Rosado', '646-925-2255','F',35,'1344 Forest Avenue, New York, NY, 10013',72000,'Ground Level',"John F. Kennedy International Airport");
+INSERT INTO employee VALUES('086-52-7069', 'Anna', 'C', 'Hiles', '646-853-0675','F',33,'2833 Farnum Road, New York, NY, 10007',77000,'Ground Level',"John F. Kennedy International Airport");
+INSERT INTO employee VALUES('056-44-0593', 'Marvin', 'H', 'Walton', '917-537-5865','M',53,'4883 Long Street, New York, NY, 10011',78000,'Ground Level',"John F. Kennedy International Airport");
+INSERT INTO employee VALUES('066-56-8658', 'Mildred', 'P', 'Becker', '917-374-7158','F',39,'1606 Oakwood Avenue, New York, NY, 10022',80000,'Ground Level',"John F. Kennedy International Airport");
+
+-- populate employee table with engineers/technicians
+INSERT INTO employee VALUES('325-16-9185', 'Christopher', 'C', 'Jackson', '773-870-2657','M',25,'1200 Victoria Street, Chicago, IL, 60631',85000,'Engineer',"O'Hare International Airport");
+INSERT INTO employee VALUES('322-72-5989', 'Janeen', 'J', 'Clark', '847-820-8843','F',29,'3552 University Drive, Chicago, IL, 60607',83000,'Engineer',"O'Hare International Airport");
+INSERT INTO employee VALUES('341-28-0957', 'Jeremy', 'H', 'Noel', '773-315-3620','M',37,'3050 Virginia Street, Chicago, IL, 60606',91000,'Engineer',"O'Hare International Airport");
+INSERT INTO employee VALUES('327-98-8421', 'Janet', 'D', 'White', '773-447-6316','F',31,'1149 John Calvin Drive, Chicago, IL, 60606',90000,'Engineer',"O'Hare International Airport");
+INSERT INTO employee VALUES('259-57-7403', 'Margarita', 'R', 'Hilliard', '404-542-6098','F',45,'2587 Musgrave Street, Atlanta, GA, 30309',95000,'Engineer',"Hartsfield-Jackson Atlanta International Airport");
+INSERT INTO employee VALUES('257-82-1234', 'Nathaniel', 'C', 'Davis', '470-375-6389','M',39,'139 Lakeland Park Drive, Atlanta, GA, 30339',94000,'Engineer',"Hartsfield-Jackson Atlanta International Airport");
+INSERT INTO employee VALUES('670-05-5965', 'Arthur', 'J', 'Groves', '404-952-7785','M',35,'3218 Despard Street, Atlanta, GA, 30303',95000,'Engineer',"Hartsfield-Jackson Atlanta International Airport");
+INSERT INTO employee VALUES('366-36-4978', 'Ruth', 'C', 'Mueller', '402-300-7169','F',26,'4832 Hart Ridge Road, Atlanta, GA, 30305',82000,'Engineer',"Hartsfield-Jackson Atlanta International Airport");
+INSERT INTO employee VALUES('129-16-7964', 'Robert', 'E', 'Traul', '646-591-6369','M',48,'3259 Duncan Avenue, New York, NY, 10007',102000,'Engineer',"John F. Kennedy International Airport");
+INSERT INTO employee VALUES('065-70-6759', 'Jose', 'E', 'Seefeldt', '646-250-9152','M',43,'1457 Small Street, New York, NY, 10017',97000,'Engineer',"John F. Kennedy International Airport");
+INSERT INTO employee VALUES('134-88-0069', 'Joseph', 'M', 'Swanson', '917-292-0581','M',30,'3930 Angus Road, New York, NY, 10019',94000,'Engineer',"John F. Kennedy International Airport");
+INSERT INTO employee VALUES('111-32-3166', 'Rita', 'A', 'Johnson', '917-817-1338','F',39,'3944 Bicetown Road, New York, NY, 10013',100000,'Engineer',"John F. Kennedy International Airport");
+
+-- Query 1: Retrieve the full name and phone number of the managers of all airports
+SELECT employee.Fname, employee.M, employee.Lname, employee.phone_number, airport.airport_name
+FROM employee
+JOIN airport
+WHERE employee.ssn = airport.gm_ssn;
+
+-- Query 2: Retrieve the average salary of employees with different job types, in the different airports
+SELECT employee.airport, employee.jobtype, AVG(employee.salary)
+FROM employee
+GROUP BY employee.airport, employee.jobtype;
+
+
+-- populate the flight table 
+INSERT INTO flight VALUES('DL0650', 'Delta Airlines', "Hartsfield-Jackson Atlanta International Airport",'2021-10-30 14:35:00', 'H10', "John F. Kennedy International Airport", '2021-10-30 16:46:00', 'J14', NULL);
+INSERT INTO flight VALUES('DL1143', 'Delta Airlines', "Hartsfield-Jackson Atlanta International Airport",'2021-10-30 19:20:00', 'H10', "John F. Kennedy International Airport", '2021-10-30 21:29:00', 'J14', NULL);
+INSERT INTO flight VALUES('DL0860', 'Delta Airlines', "Hartsfield-Jackson Atlanta International Airport",'2021-10-30 09:56:00', 'H10', "John F. Kennedy International Airport", '2021-10-30 12:10:00', 'J14', NULL);
+INSERT INTO flight VALUES('DL2822', 'Delta Airlines', "Hartsfield-Jackson Atlanta International Airport",'2021-10-30 07:50:00', 'H11', "O'Hare International Airport", '2021-10-30 08:50:00', 'O06', NULL);
+INSERT INTO flight VALUES('DL1725', 'Delta Airlines', "Hartsfield-Jackson Atlanta International Airport",'2021-10-30 10:15:00', 'H11', "O'Hare International Airport", '2021-10-30 11:16:00', 'O06', NULL);
+INSERT INTO flight VALUES('DL2864', 'Delta Airlines', "Hartsfield-Jackson Atlanta International Airport",'2021-10-30 12:20:00', 'H11', "O'Hare International Airport", '2021-10-30 13:24:00', 'O06', NULL);
+INSERT INTO flight VALUES('DL5493', 'Delta Airlines', "O'Hare International Airport",'2021-10-30 06:55:00', 'O04', "John F. Kennedy International Airport", '2021-10-30 10:03:00', 'J17', NULL);
+INSERT INTO flight VALUES('DL5710', 'Delta Airlines', "O'Hare International Airport",'2021-10-30 10:48:00', 'O04', "John F. Kennedy International Airport", '2021-10-30 13:51:00', 'J17', NULL);
+INSERT INTO flight VALUES('DL5616', 'Delta Airlines', "O'Hare International Airport",'2021-10-30 14:30:00', 'O04', "John F. Kennedy International Airport", '2021-10-30 17:41:00', 'J17', NULL);
+
+INSERT INTO flight VALUES('AA9222', 'American Airlines', "Hartsfield-Jackson Atlanta International Airport",'2021-10-30 07:00:00', 'H12', "John F. Kennedy International Airport", '2021-10-30 09:13:00', 'J16', NULL);
+INSERT INTO flight VALUES('AA9264', 'American Airlines', "Hartsfield-Jackson Atlanta International Airport",'2021-10-30 16:20:00', 'H12', "John F. Kennedy International Airport", '2021-10-30 18:30:00', 'J16', NULL);
+INSERT INTO flight VALUES('AA9123', 'American Airlines', "Hartsfield-Jackson Atlanta International Airport",'2021-10-30 08:59:00', 'H12', "John F. Kennedy International Airport", '2021-10-30 11:08:00', 'J16', NULL);
+INSERT INTO flight VALUES('AA1574', 'American Airlines', "Hartsfield-Jackson Atlanta International Airport",'2021-10-30 18:07:00', 'H13', "O'Hare International Airport", '2021-10-30 19:08:00', 'O08', NULL);
+INSERT INTO flight VALUES('AA1300', 'American Airlines', "Hartsfield-Jackson Atlanta International Airport",'2021-10-30 10:25:00', 'H13', "O'Hare International Airport", '2021-10-30 11:28:00', 'O08', NULL);
+INSERT INTO flight VALUES('AA3511', 'American Airlines', "Hartsfield-Jackson Atlanta International Airport",'2021-10-30 15:10:00', 'H13', "O'Hare International Airport", '2021-10-30 16:27:00', 'O08', NULL);
+INSERT INTO flight VALUES('AA1378', 'American Airlines', "O'Hare International Airport",'2021-10-30 12:44:00', 'O05', "John F. Kennedy International Airport", '2021-10-30 15:47:00', 'J18', NULL);
+INSERT INTO flight VALUES('AA1301', 'American Airlines', "O'Hare International Airport",'2021-10-30 15:50:00', 'O05', "John F. Kennedy International Airport", '2021-10-30 21:03:00', 'J18', NULL);
+INSERT INTO flight VALUES('AA9235', 'American Airlines', "O'Hare International Airport",'2021-10-30 13:15:00', 'O05', "John F. Kennedy International Airport", '2021-10-30 17:03:00', 'J18', NULL);
+
+-- populate aircraft table
+INSERT INTO aircraft VALUES(1, 'B737-800', 162, '2001-01-24');
+INSERT INTO aircraft VALUES(2, 'B737-800', 162, '2008-10-16');
+INSERT INTO aircraft VALUES(3, 'B737-800', 162, '1998-02-06');
+INSERT INTO aircraft VALUES(4, 'A320', 150, '2016-12-03');
+INSERT INTO aircraft VALUES(5, 'A320', 150, '2012-03-20');
+INSERT INTO aircraft VALUES(6, 'A320', 150, '2009-03-04');
+INSERT INTO aircraft VALUES(7, 'E175', 78, '2000-01-09');
+INSERT INTO aircraft VALUES(8, 'E175', 78, '2003-11-02');
+INSERT INTO aircraft VALUES(9, 'E175', 78, '1994-11-27');
+INSERT INTO aircraft VALUES(10, 'A320', 150, '2005-03-16');
+INSERT INTO aircraft VALUES(11, 'A320', 150, '2011-06-22');
+INSERT INTO aircraft VALUES(12, 'A320', 150, '2016-07-31');
+INSERT INTO aircraft VALUES(13, 'A320', 150, '2015-01-17');
+INSERT INTO aircraft VALUES(14, 'A320', 150, '2008-05-05');
+INSERT INTO aircraft VALUES(15, 'E175', 78, '2011-12-18');
+INSERT INTO aircraft VALUES(16, 'B737-800', 162, '2002-06-16');
+INSERT INTO aircraft VALUES(17, 'B737-800', 162, '2000-01-27');
+INSERT INTO aircraft VALUES(18, 'E175', 78, '2001-09-01');
+
+
+-- add manufacturer to aircraft_model table
+ALTER TABLE aircraft_model
+ADD manufacturer VARCHAR(10);
+
+UPDATE aircraft_model
+SET manufacturer = 'Boeing'
+WHERE model LIKE 'B%';
+
+UPDATE aircraft_model
+SET manufacturer = 'Airbus'
+WHERE model LIKE 'A%';
+
+UPDATE aircraft_model
+SET manufacturer = 'Embraer'
+WHERE model LIKE 'E%';
+
+
+
+
+UPDATE flight
+SET aircraft_sno = 1
+WHERE flightID = 'DL0650';
+UPDATE flight
+SET aircraft_sno = 2
+WHERE flightID = 'DL1143';
+UPDATE flight
+SET aircraft_sno = 3
+WHERE flightID = 'DL0860';
+UPDATE flight
+SET aircraft_sno = 4
+WHERE flightID = 'DL2822';
+UPDATE flight
+SET aircraft_sno = 5
+WHERE flightID = 'DL1725';
+UPDATE flight
+SET aircraft_sno = 6
+WHERE flightID = 'DL2864';
+UPDATE flight
+SET aircraft_sno = 7
+WHERE flightID = 'DL5493';
+UPDATE flight
+SET aircraft_sno = 8
+WHERE flightID = 'DL5710';
+UPDATE flight
+SET aircraft_sno = 9
+WHERE flightID = 'DL5616';
+UPDATE flight
+SET aircraft_sno = 10
+WHERE flightID = 'AA9222';
+UPDATE flight
+SET aircraft_sno = 11
+WHERE flightID = 'AA9264';
+UPDATE flight
+SET aircraft_sno = 12
+WHERE flightID = 'AA9123';
+UPDATE flight
+SET aircraft_sno = 13
+WHERE flightID = 'AA1574';
+UPDATE flight
+SET aircraft_sno = 14
+WHERE flightID = 'AA1300';
+UPDATE flight
+SET aircraft_sno = 15
+WHERE flightID = 'AA3511';
+UPDATE flight
+SET aircraft_sno = 16
+WHERE flightID = 'AA1378';
+UPDATE flight
+SET aircraft_sno = 17
+WHERE flightID = 'AA1301';
+UPDATE flight
+SET aircraft_sno = 18
+WHERE flightID = 'AA9235';
+
+
+
+-- add return flights, I'll keep the same crew
+INSERT INTO flight VALUES('DL0651', 'Delta Airlines', "John F. Kennedy International Airport",'2021-11-01 14:35:00', 'J14', "Hartsfield-Jackson Atlanta International Airport", '2021-11-01 16:46:00', 'H10', 1);
+INSERT INTO flight VALUES('DL1144', 'Delta Airlines', "John F. Kennedy International Airport",'2021-11-01 19:20:00', 'J14', "Hartsfield-Jackson Atlanta International Airport", '2021-11-01 21:29:00', 'H10', 2);
+INSERT INTO flight VALUES('DL0861', 'Delta Airlines', "John F. Kennedy International Airport",'2021-11-01 09:56:00', 'J14', "Hartsfield-Jackson Atlanta International Airport", '2021-11-01 12:10:00', 'H10', 3);
+INSERT INTO flight VALUES('DL2823', 'Delta Airlines', "O'Hare International Airport",'2021-11-01 07:50:00', 'O06', "Hartsfield-Jackson Atlanta International Airport", '2021-11-01 08:50:00', 'H11', 4);
+INSERT INTO flight VALUES('DL1726', 'Delta Airlines', "O'Hare International Airport",'2021-11-01 10:15:00', 'O06', "Hartsfield-Jackson Atlanta International Airport", '2021-11-01 11:16:00', 'H11', 5);
+INSERT INTO flight VALUES('DL2865', 'Delta Airlines', "O'Hare International Airport",'2021-11-01 12:20:00', 'O06', "Hartsfield-Jackson Atlanta International Airport", '2021-11-01 13:24:00', 'H11', 6);
+INSERT INTO flight VALUES('DL5494', 'Delta Airlines', "John F. Kennedy International Airport",'2021-11-01 06:55:00', 'J17', "O'Hare International Airport", '2021-11-01 10:03:00', 'O04', 7);
+INSERT INTO flight VALUES('DL5711', 'Delta Airlines', "John F. Kennedy International Airport",'2021-11-01 10:48:00', 'J17', "O'Hare International Airport", '2021-11-01 13:51:00', 'O04', 8);
+INSERT INTO flight VALUES('DL5617', 'Delta Airlines', "John F. Kennedy International Airport",'2021-11-01 14:30:00', 'J17', "O'Hare International Airport", '2021-11-01 17:41:00', 'O04', 9);
+
+INSERT INTO flight VALUES('AA9223', 'American Airlines', "John F. Kennedy International Airport",'2021-11-01 07:00:00', 'J16', "Hartsfield-Jackson Atlanta International Airport", '2021-11-01 09:13:00', 'H12', 10);
+INSERT INTO flight VALUES('AA9265', 'American Airlines', "John F. Kennedy International Airport",'2021-11-01 16:20:00', 'J16', "Hartsfield-Jackson Atlanta International Airport", '2021-11-01 18:30:00', 'H12', 11);
+INSERT INTO flight VALUES('AA9124', 'American Airlines', "John F. Kennedy International Airport",'2021-11-01 08:59:00', 'J16', "Hartsfield-Jackson Atlanta International Airport", '2021-11-01 11:08:00', 'H12', 12);
+INSERT INTO flight VALUES('AA1575', 'American Airlines', "O'Hare International Airport",'2021-11-01 18:07:00', 'O08', "Hartsfield-Jackson Atlanta International Airport", '2021-11-01 19:08:00', 'H13', 13);
+INSERT INTO flight VALUES('AA1299', 'American Airlines', "O'Hare International Airport",'2021-11-01 10:25:00', 'O08', "Hartsfield-Jackson Atlanta International Airport", '2021-11-01 11:28:00', 'H13', 14);
+INSERT INTO flight VALUES('AA3512', 'American Airlines', "O'Hare International Airport",'2021-11-01 15:10:00', 'O08', "Hartsfield-Jackson Atlanta International Airport", '2021-11-01 16:27:00', 'H13', 15);
+INSERT INTO flight VALUES('AA1379', 'American Airlines', "John F. Kennedy International Airport",'2021-11-01 12:44:00', 'J18', "O'Hare International Airport", '2021-11-01 15:47:00', 'O05', 16);
+INSERT INTO flight VALUES('AA1302', 'American Airlines', "John F. Kennedy International Airport",'2021-11-01 15:50:00', 'J18', "O'Hare International Airport", '2021-11-01 21:03:00', 'O05', 17);
+INSERT INTO flight VALUES('AA9236', 'American Airlines', "John F. Kennedy International Airport",'2021-11-01 13:15:00', 'J18', "O'Hare International Airport", '2021-11-01 17:03:00', 'O05', 18);
+-- bug correction
+UPDATE flight 
+SET d_time = '2021-10-30 15:50:00' 
+WHERE flightID='AA1301';
+
+SELECT * FROM flight;
+SELECT * FROM aircraft;
+
+-- populate flight crew table
+INSERT INTO flight_crew VALUES('546829653', 'Keisha T Wallace', 15, 42, 'F', 'Pilot-Captain');
+INSERT INTO flight_crew VALUES('420484971', 'Sarah G Foley', 7, 29, 'F', 'Pilot-First Officer');
+INSERT INTO flight_crew VALUES('907887501', 'Nancy T Phillips', 10, 37, 'F', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('821157897', 'Jimmy M Davis', 25, 56, 'M', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('725208287', 'Matthew D Rodriguez', 19, 44, 'M', 'Pilot-Captain');
+INSERT INTO flight_crew VALUES('928631416', 'John J Whiteaker', 11, 37, 'M', 'Pilot-First Officer');
+INSERT INTO flight_crew VALUES('100909199', 'Marie N Erwin', 2, 24, 'F', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('892024783', 'Anthony D Lugo', 5, 29, 'M', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('422581953', 'Joseph P Castaneda', 25, 57, 'M', 'Pilot-Captain');
+INSERT INTO flight_crew VALUES('382307854', 'Trista C Robinson', 13, 42, 'F', 'Pilot-First Officer');
+INSERT INTO flight_crew VALUES('782458020', 'Kristy B Polston', 1, 23, 'F', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('462341113', 'Ronald K Moore', 2, 26, 'M', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('968944560', 'Jack C Hubbs', 8, 33, 'M', 'Pilot-Captain');
+INSERT INTO flight_crew VALUES('403401374', 'Christopher S Cash', 7, 29, 'M', 'Pilot-First Officer');
+INSERT INTO flight_crew VALUES('846487034', 'Mary E Robinson', 15, 37, 'F', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('999407928', 'Cecile S Arroyo', 5, 30, 'F', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('793164877', 'Alton G Brown', 30, 56, 'M', 'Pilot-Captain');
+INSERT INTO flight_crew VALUES('818744786', 'David L Stevenson', 7, 31, 'M', 'Pilot-First Officer');
+INSERT INTO flight_crew VALUES('144861342', 'David H Jester', 8, 35, 'M', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('405513003', 'Carolyn J Valdes', 5, 28, 'F', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('225815180', 'Sarah R Brent', 15, 42, 'F', 'Pilot-Captain');
+INSERT INTO flight_crew VALUES('764936757', 'Esther M Rider', 13, 39, 'F', 'Pilot-First Officer');
+INSERT INTO flight_crew VALUES('793780651', 'Eileen R White', 19, 45, 'F', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('343192698', 'Cindy J Gilbert', 10, 36, 'F', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('305054206', 'Timothy S Moore', 25, 52, 'M', 'Pilot-Captain');
+INSERT INTO flight_crew VALUES('824931648', 'Florinda N Harris', 11, 35, 'F', 'Pilot-First Officer');
+INSERT INTO flight_crew VALUES('902296895', 'Dominic L Johnson', 8, 33, 'M', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('380745787', 'Lucy K Bragg', 5, 29, 'F', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('188501599', 'Jerry M Curtis', 30, 60, 'M', 'Pilot-Captain');
+INSERT INTO flight_crew VALUES('982015967', 'Pamela R Smith', 14, 39, 'F', 'Pilot-First Officer');
+INSERT INTO flight_crew VALUES('499143554', 'John R West', 10, 39, 'M', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('572134238', 'Stephen A McGee', 12, 36, 'M', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('623948865', 'Joseph C Jackson', 15, 40, 'M', 'Pilot-Captain');
+INSERT INTO flight_crew VALUES('586125128', 'Emma D Hope', 8, 32, 'F', 'Pilot-First Officer');
+INSERT INTO flight_crew VALUES('639480480', 'Cynthia A Dion', 1, 24, 'F', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('411433144', 'Carla N Alvarez', 3, 26, 'F', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('458827923', 'Tracy L Pena', 7, 30, 'F', 'Pilot-Captain');
+INSERT INTO flight_crew VALUES('382656167', 'Carl G Woodruff', 5, 29, 'M', 'Pilot-First Officer');
+INSERT INTO flight_crew VALUES('675293019', 'William A Gomez', 30, 57, 'M', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('503067404', 'James E Reilly', 3, 27, 'M', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('718374651', 'Jimmy G Roush', 24, 49, 'M', 'Pilot-Captain');
+INSERT INTO flight_crew VALUES('796676229', 'Alicia J Willingham', 5, 29, 'F', 'Pilot-First Officer');
+INSERT INTO flight_crew VALUES('989077034', 'Samantha O Hofman', 19, 43, 'F', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('470048212', 'Lisa T Rich', 17, 46, 'F', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('298574842', 'Beatrice F Matheny', 12, 42, 'F', 'Pilot-Captain');
+INSERT INTO flight_crew VALUES('232263423', 'Brian J Clark', 3, 29, 'M', 'Pilot-First Officer');
+INSERT INTO flight_crew VALUES('351332893', 'Maria R Moreno', 11, 37, 'F', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('406671248', 'Lola M Pierce', 20, 46, 'M', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('971735759', 'Mona N Rodriguez', 14, 42, 'F', 'Pilot-Captain');
+INSERT INTO flight_crew VALUES('765274117', 'Martha E Barlow', 9, 35, 'F', 'Pilot-First Officer');
+INSERT INTO flight_crew VALUES('211218261', 'Ray S Hinton', 22, 46, 'M', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('797200686', 'Leroy M Franklin', 10, 36, 'M', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('141611986', 'Howard F Taylor', 16, 42, 'M', 'Pilot-Captain');
+INSERT INTO flight_crew VALUES('823056602', 'Virginia M Willis', 2, 24, 'F', 'Pilot-First Officer');
+INSERT INTO flight_crew VALUES('990284956', 'Ken R Knight', 11, 37, 'M', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('898726099', 'Michael T Pryor', 12, 36, 'M', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('495269464', 'Pete A Myers', 14, 44, 'M', 'Pilot-Captain');
+INSERT INTO flight_crew VALUES('529777314', 'Bob B Byers', 4, 29, 'M', 'Pilot-First Officer');
+INSERT INTO flight_crew VALUES('389305568', 'Annie B Henderson', 1, 27, 'F', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('768281236', 'Michael K Larson', 2, 26, 'M', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('917690624', 'Corey C Kirsch', 17, 42, 'M', 'Pilot-Captain');
+INSERT INTO flight_crew VALUES('793446686', 'Wendy J Stevenson', 5, 29, 'F', 'Pilot-First Officer');
+INSERT INTO flight_crew VALUES('257223046', 'William J Brown', 8, 33, 'M', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('856265809', 'Nathalie E Evans', 12, 36, 'F', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('616642531', 'Mandy A Fullwood', 15, 42, 'F', 'Pilot-Captain');
+INSERT INTO flight_crew VALUES('806280731', 'Edward S Asher', 6, 29, 'M', 'Pilot-First Officer');
+INSERT INTO flight_crew VALUES('800424295', 'Brian H Galasso', 9, 32, 'M', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('142802800', 'Derrick G Perri', 12, 40, 'M', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('781487838', 'Brian L Downs', 24, 52, 'M', 'Pilot-Captain');
+INSERT INTO flight_crew VALUES('893617708', 'Linda P Bogart', 12, 35, 'F', 'Pilot-First Officer');
+INSERT INTO flight_crew VALUES('360751315', 'Richard J Brooks', 7, 37, 'M', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('953736008', 'Jimmy M Davis', 2, 26, 'M', 'Flight Attendant');
+-- NOT ASSIGNED TO A FLIGHT YET (created extra tuples)
+INSERT INTO flight_crew VALUES('145068804', 'Robert T Creech', 23, 52, 'M', 'Pilot-Captain');
+INSERT INTO flight_crew VALUES('451815443', 'Cody M Ortez', 14, 39, 'M', 'Pilot-First Officer');
+INSERT INTO flight_crew VALUES('153558822', 'Carole J Hicks', 14, 37, 'F', 'Flight Attendant');
+INSERT INTO flight_crew VALUES('736110530', 'Derrick C Lee', 4, 26, 'M', 'Flight Attendant');
+
+
+INSERT INTO crew VALUES('DL0650', '546829653');
+INSERT INTO crew VALUES('DL0650', '420484971');
+INSERT INTO crew VALUES('DL0650', '907887501');
+INSERT INTO crew VALUES('DL0650', '821157897');
+
+INSERT INTO crew VALUES('DL1143', '725208287');
+INSERT INTO crew VALUES('DL1143', '928631416');
+INSERT INTO crew VALUES('DL1143', '100909199');
+INSERT INTO crew VALUES('DL1143', '892024783');
+
+INSERT INTO crew VALUES('DL0860', '422581953');
+INSERT INTO crew VALUES('DL0860', '382307854');
+INSERT INTO crew VALUES('DL0860', '782458020');
+INSERT INTO crew VALUES('DL0860', '462341113');
+
+INSERT INTO crew VALUES('DL2822', '968944560');
+INSERT INTO crew VALUES('DL2822', '403401374');
+INSERT INTO crew VALUES('DL2822', '846487034');
+INSERT INTO crew VALUES('DL2822', '999407928');
+
+INSERT INTO crew VALUES('DL1725', '793164877');
+INSERT INTO crew VALUES('DL1725', '818744786');
+INSERT INTO crew VALUES('DL1725', '144861342');
+INSERT INTO crew VALUES('DL1725', '405513003');
+
+INSERT INTO crew VALUES('DL2864', '225815180');
+INSERT INTO crew VALUES('DL2864', '764936757');
+INSERT INTO crew VALUES('DL2864', '793780651');
+INSERT INTO crew VALUES('DL2864', '343192698');
+
+INSERT INTO crew VALUES('DL5493', '305054206');
+INSERT INTO crew VALUES('DL5493', '824931648');
+INSERT INTO crew VALUES('DL5493', '902296895');
+INSERT INTO crew VALUES('DL5493', '380745787');
+
+INSERT INTO crew VALUES('DL5710', '188501599');
+INSERT INTO crew VALUES('DL5710', '982015967');
+INSERT INTO crew VALUES('DL5710', '499143554');
+INSERT INTO crew VALUES('DL5710', '572134238');
+
+INSERT INTO crew VALUES('DL5616', '623948865');
+INSERT INTO crew VALUES('DL5616', '586125128');
+INSERT INTO crew VALUES('DL5616', '639480480');
+INSERT INTO crew VALUES('DL5616', '411433144');
+
+INSERT INTO crew VALUES('AA9222', '458827923');
+INSERT INTO crew VALUES('AA9222', '382656167');
+INSERT INTO crew VALUES('AA9222', '675293019');
+INSERT INTO crew VALUES('AA9222', '503067404');
+
+INSERT INTO crew VALUES('AA9264', '718374651');
+INSERT INTO crew VALUES('AA9264', '796676229');
+INSERT INTO crew VALUES('AA9264', '989077034');
+INSERT INTO crew VALUES('AA9264', '470048212');
+
+INSERT INTO crew VALUES('AA9123', '298574842');
+INSERT INTO crew VALUES('AA9123', '232263423');
+INSERT INTO crew VALUES('AA9123', '351332893');
+INSERT INTO crew VALUES('AA9123', '406671248');
+
+INSERT INTO crew VALUES('AA1574', '971735759');
+INSERT INTO crew VALUES('AA1574', '765274117');
+INSERT INTO crew VALUES('AA1574', '211218261');
+INSERT INTO crew VALUES('AA1574', '797200686');
+
+INSERT INTO crew VALUES('AA1300', '141611986');
+INSERT INTO crew VALUES('AA1300', '823056602');
+INSERT INTO crew VALUES('AA1300', '990284956');
+INSERT INTO crew VALUES('AA1300', '898726099');
+
+INSERT INTO crew VALUES('AA3511', '495269464');
+INSERT INTO crew VALUES('AA3511', '529777314');
+INSERT INTO crew VALUES('AA3511', '389305568');
+INSERT INTO crew VALUES('AA3511', '768281236');
+
+INSERT INTO crew VALUES('AA1378', '917690624');
+INSERT INTO crew VALUES('AA1378', '793446686');
+INSERT INTO crew VALUES('AA1378', '257223046');
+INSERT INTO crew VALUES('AA1378', '856265809');
+
+INSERT INTO crew VALUES('AA1301', '616642531');
+INSERT INTO crew VALUES('AA1301', '806280731');
+INSERT INTO crew VALUES('AA1301', '800424295');
+INSERT INTO crew VALUES('AA1301', '142802800');
+
+INSERT INTO crew VALUES('AA9235', '781487838');
+INSERT INTO crew VALUES('AA9235', '893617708');
+INSERT INTO crew VALUES('AA9235', '360751315');
+INSERT INTO crew VALUES('AA9235', '953736008');
+
+-- add crew for return flights
+INSERT INTO crew VALUES('DL0651', '546829653');
+INSERT INTO crew VALUES('DL0651', '420484971');
+INSERT INTO crew VALUES('DL0651', '907887501');
+INSERT INTO crew VALUES('DL0651', '821157897');
+
+INSERT INTO crew VALUES('DL1144', '725208287');
+INSERT INTO crew VALUES('DL1144', '928631416');
+INSERT INTO crew VALUES('DL1144', '100909199');
+INSERT INTO crew VALUES('DL1144', '892024783');
+
+INSERT INTO crew VALUES('DL0861', '422581953');
+INSERT INTO crew VALUES('DL0861', '382307854');
+INSERT INTO crew VALUES('DL0861', '782458020');
+INSERT INTO crew VALUES('DL0861', '462341113');
+
+INSERT INTO crew VALUES('DL2823', '968944560');
+INSERT INTO crew VALUES('DL2823', '403401374');
+INSERT INTO crew VALUES('DL2823', '846487034');
+INSERT INTO crew VALUES('DL2823', '999407928');
+
+INSERT INTO crew VALUES('DL1726', '793164877');
+INSERT INTO crew VALUES('DL1726', '818744786');
+INSERT INTO crew VALUES('DL1726', '144861342');
+INSERT INTO crew VALUES('DL1726', '405513003');
+
+INSERT INTO crew VALUES('DL2865', '225815180');
+INSERT INTO crew VALUES('DL2865', '764936757');
+INSERT INTO crew VALUES('DL2865', '793780651');
+INSERT INTO crew VALUES('DL2865', '343192698');
+
+INSERT INTO crew VALUES('DL5494', '305054206');
+INSERT INTO crew VALUES('DL5494', '824931648');
+INSERT INTO crew VALUES('DL5494', '902296895');
+INSERT INTO crew VALUES('DL5494', '380745787');
+
+INSERT INTO crew VALUES('DL5711', '188501599');
+INSERT INTO crew VALUES('DL5711', '982015967');
+INSERT INTO crew VALUES('DL5711', '499143554');
+INSERT INTO crew VALUES('DL5711', '572134238');
+
+INSERT INTO crew VALUES('DL5617', '623948865');
+INSERT INTO crew VALUES('DL5617', '586125128');
+INSERT INTO crew VALUES('DL5617', '639480480');
+INSERT INTO crew VALUES('DL5617', '411433144');
+
+INSERT INTO crew VALUES('AA9223', '458827923');
+INSERT INTO crew VALUES('AA9223', '382656167');
+INSERT INTO crew VALUES('AA9223', '675293019');
+INSERT INTO crew VALUES('AA9223', '503067404');
+
+INSERT INTO crew VALUES('AA9265', '718374651');
+INSERT INTO crew VALUES('AA9265', '796676229');
+INSERT INTO crew VALUES('AA9265', '989077034');
+INSERT INTO crew VALUES('AA9265', '470048212');
+
+INSERT INTO crew VALUES('AA9124', '298574842');
+INSERT INTO crew VALUES('AA9124', '232263423');
+INSERT INTO crew VALUES('AA9124', '351332893');
+INSERT INTO crew VALUES('AA9124', '406671248');
+
+INSERT INTO crew VALUES('AA1575', '971735759');
+INSERT INTO crew VALUES('AA1575', '765274117');
+INSERT INTO crew VALUES('AA1575', '211218261');
+INSERT INTO crew VALUES('AA1575', '797200686');
+
+INSERT INTO crew VALUES('AA1299', '141611986');
+INSERT INTO crew VALUES('AA1299', '823056602');
+INSERT INTO crew VALUES('AA1299', '990284956');
+INSERT INTO crew VALUES('AA1299', '898726099');
+
+INSERT INTO crew VALUES('AA3512', '495269464');
+INSERT INTO crew VALUES('AA3512', '529777314');
+INSERT INTO crew VALUES('AA3512', '389305568');
+INSERT INTO crew VALUES('AA3512', '768281236');
+
+INSERT INTO crew VALUES('AA1379', '917690624');
+INSERT INTO crew VALUES('AA1379', '793446686');
+INSERT INTO crew VALUES('AA1379', '257223046');
+INSERT INTO crew VALUES('AA1379', '856265809');
+
+INSERT INTO crew VALUES('AA1302', '616642531');
+INSERT INTO crew VALUES('AA1302', '806280731');
+INSERT INTO crew VALUES('AA1302', '800424295');
+INSERT INTO crew VALUES('AA1302', '142802800');
+
+INSERT INTO crew VALUES('AA9236', '781487838');
+INSERT INTO crew VALUES('AA9236', '893617708');
+INSERT INTO crew VALUES('AA9236', '360751315');
+INSERT INTO crew VALUES('AA9236', '953736008');
+
+
+SELECT * FROM flight_crew;
+SELECT * FROM crew;
+
+-- Query 3: Get the average years of experience of the flight crew on each flight.
+SELECT crew.flightID, AVG(flight_crew.yrs_exp)
+FROM crew 
+JOIN flight_crew
+WHERE crew.passport_number = flight_crew.passport_number
+GROUP BY crew.flightID;
+
+-- Query 4: Get the average years of experience for the captain, first officer and flight attendants on all routes
+
+
+
+
+-- SLIGHT CHANGE IN TABLES
+
+-- drop capacity column from aircraft
+SELECT * FROM aircraft LIMIT 5;
+ALTER TABLE aircraft DROP COLUMN capacity;
+SELECT * FROM aircraft LIMIT 5;
+
+-- create a separate table for the aircraft models and use the model as an attribiute in the relationship specialize_in
+CREATE TABLE aircraft_model(
+    model VARCHAR(10) PRIMARY KEY,
+    capacity INT
+);
+
+INSERT INTO aircraft_model VALUES('B737-800', 162);
+INSERT INTO aircraft_model VALUES('A320', 150);
+INSERT INTO aircraft_model VALUES('E175', 78);
+
+ALTER TABLE aircraft
+ADD FOREIGN KEY(model)
+REFERENCES aircraft_model(model)
+ON DELETE SET NULL;
+
+ALTER TABLE specialize_in
+ADD FOREIGN KEY(model)
+REFERENCES aircraft_model(model)
+ON DELETE SET NULL;
+
+
+-- populate the specialize_in table
+INSERT INTO specialize_in VALUES('325-16-9185', 'B737-800');
+INSERT INTO specialize_in VALUES('322-72-5989', 'A320');
+INSERT INTO specialize_in VALUES('341-28-0957', 'E175');
+INSERT INTO specialize_in VALUES('327-98-8421', 'B737-800');
+INSERT INTO specialize_in VALUES('259-57-7403', 'B737-800');
+INSERT INTO specialize_in VALUES('257-82-1234', 'A320');
+INSERT INTO specialize_in VALUES('670-05-5965', 'A320');
+INSERT INTO specialize_in VALUES('366-36-4978', 'E175');
+INSERT INTO specialize_in VALUES('129-16-7964', 'B737-800');
+INSERT INTO specialize_in VALUES('065-70-6759', 'B737-800');
+INSERT INTO specialize_in VALUES('134-88-0069', 'A320');
+INSERT INTO specialize_in VALUES('111-32-3166', 'E175');
+
+
+-- populate the hangar table
+INSERT INTO hangar VALUES("O'Hare International Airport", 1, "North");
+INSERT INTO hangar VALUES("O'Hare International Airport", 2, "South-East");
+INSERT INTO hangar VALUES("O'Hare International Airport", 3, "North-West");
+INSERT INTO hangar VALUES("Hartsfield-Jackson Atlanta International Airport", 1, "South");
+INSERT INTO hangar VALUES("Hartsfield-Jackson Atlanta International Airport", 2, "North-East");
+INSERT INTO hangar VALUES("Hartsfield-Jackson Atlanta International Airport", 3, "West");
+INSERT INTO hangar VALUES("John F. Kennedy International Airport", 1, "East");
+INSERT INTO hangar VALUES("John F. Kennedy International Airport", 2, "North");
+INSERT INTO hangar VALUES("John F. Kennedy International Airport", 3, "South-West");
+
+
+-- populate the works_at table
+INSERT INTO works_at VALUES("O'Hare International Airport", 1, '325-16-9185');
+INSERT INTO works_at VALUES("O'Hare International Airport", 2, '322-72-5989');
+INSERT INTO works_at VALUES("O'Hare International Airport", 3, '341-28-0957');
+INSERT INTO works_at VALUES("O'Hare International Airport", 1, '327-98-8421');
+INSERT INTO works_at VALUES("Hartsfield-Jackson Atlanta International Airport", 1, '259-57-7403');
+INSERT INTO works_at VALUES("Hartsfield-Jackson Atlanta International Airport", 2, '257-82-1234');
+INSERT INTO works_at VALUES("Hartsfield-Jackson Atlanta International Airport", 2, '670-05-5965');
+INSERT INTO works_at VALUES("Hartsfield-Jackson Atlanta International Airport", 3, '366-36-4978');
+INSERT INTO works_at VALUES("John F. Kennedy International Airport", 1, '129-16-7964');
+INSERT INTO works_at VALUES("John F. Kennedy International Airport", 2, '065-70-6759');
+INSERT INTO works_at VALUES("John F. Kennedy International Airport", 3, '134-88-0069');
+INSERT INTO works_at VALUES("John F. Kennedy International Airport", 3, '111-32-3166');
+
+
+-- populate the undergoes_maintenance table
+INSERT INTO undergoes_maintenance VALUES("O'Hare International Airport", 3, 7, 'Repaired Flaps', '2021-10-29');
+INSERT INTO undergoes_maintenance VALUES("O'Hare International Airport", 3, 8, 'Autopilot Software Update', '2021-10-30');
+INSERT INTO undergoes_maintenance VALUES("O'Hare International Airport", 3, 9, 'General Maintenance', '2021-10-29');
+INSERT INTO undergoes_maintenance VALUES("O'Hare International Airport", 2, 14, 'General Maintenance', '2021-10-31');
+
+INSERT INTO undergoes_maintenance VALUES("Hartsfield-Jackson Atlanta International Airport", 1, 1, 'Repaired Rudder', '2021-10-29');
+INSERT INTO undergoes_maintenance VALUES("Hartsfield-Jackson Atlanta International Airport", 1, 2, 'General Maintenance', '2021-10-29');
+INSERT INTO undergoes_maintenance VALUES("Hartsfield-Jackson Atlanta International Airport", 2, 10, 'General Maintenance', '2021-10-29');
+INSERT INTO undergoes_maintenance VALUES("Hartsfield-Jackson Atlanta International Airport", 2, 11, 'Painted', '2021-10-28');
+
+INSERT INTO undergoes_maintenance VALUES("John F. Kennedy International Airport", 1, 16, 'Engine Tests', '2021-10-31');
+INSERT INTO undergoes_maintenance VALUES("John F. Kennedy International Airport", 2, 17, 'Autopilot Software Update', '2021-10-31');
+INSERT INTO undergoes_maintenance VALUES("John F. Kennedy International Airport", 3, 18, 'Brake Check', '2021-10-31');
+
+INSERT INTO undergoes_maintenance VALUES("Hartsfield-Jackson Atlanta International Airport", 2, 4, 'General Maintenance', '2021-11-01');
+INSERT INTO undergoes_maintenance VALUES("Hartsfield-Jackson Atlanta International Airport", 1, 3, 'Repaired Rudder', '2021-11-01');
+INSERT INTO undergoes_maintenance VALUES("Hartsfield-Jackson Atlanta International Airport", 2, 5, 'Spoilers Testing', '2021-11-01');
+INSERT INTO undergoes_maintenance VALUES("Hartsfield-Jackson Atlanta International Airport", 2, 6, 'Autopilot Software Update', '2021-11-02');
+INSERT INTO undergoes_maintenance VALUES("Hartsfield-Jackson Atlanta International Airport", 2, 12, 'Engine Tests', '2021-11-02');
+INSERT INTO undergoes_maintenance VALUES("Hartsfield-Jackson Atlanta International Airport", 2, 13, 'Spoilers Testing', '2021-11-02');
+INSERT INTO undergoes_maintenance VALUES("Hartsfield-Jackson Atlanta International Airport", 3, 15, 'Paint Job', '2021-11-02');
+
+
+-- QUERIES
+show tables;
+
+
+-- Query 1: Retrieve the full name and phone number of the managers of all airports
+SELECT employee.Fname, employee.M, employee.Lname, employee.phone_number, airport.airport_name
+FROM employee
+JOIN airport
+ON employee.ssn = airport.gm_ssn;
+
+-- Query 2: Retrieve the average salary of employees with different job types, in the different airports
+SELECT employee.airport, employee.jobtype, AVG(employee.salary)
+FROM employee
+GROUP BY employee.airport, employee.jobtype;
+
+-- Query 3: Get the average years of experience of the flight crew on each flight.
+SELECT crew.flightID, AVG(flight_crew.yrs_exp)
+FROM crew 
+JOIN flight_crew
+ON crew.passport_number = flight_crew.passport_number
+GROUP BY crew.flightID;
+
+-- Query 4: Get the average years of experience for the captain, first officer and flight attendants on all flights from Atlanta to Chicago
+SELECT flight.d_airport, flight.a_airport, flight_crew.jobtype, AVG(flight_crew.yrs_exp)
+FROM flight
+INNER JOIN crew 
+ON flight.flightID = crew.flightID
+INNER JOIN flight_crew
+ON crew.passport_number = flight_crew.passport_number
+WHERE flight.d_airport = "Hartsfield-Jackson Atlanta International Airport" AND flight.a_airport = "O'Hare International Airport"
+GROUP BY flight_crew.jobtype;
+
+-- Get the average years of experience for the captain, first officer and flight attendants on all routes travelled
+SELECT flight.d_airport, flight.a_airport, flight_crew.jobtype, AVG(flight_crew.yrs_exp)
+FROM flight
+INNER JOIN crew 
+ON flight.flightID = crew.flightID
+INNER JOIN flight_crew
+ON crew.passport_number = flight_crew.passport_number
+WHERE flight.d_airport IN (
+    SELECT DISTINCT flight.d_airport
+    FROM flight
+) AND flight.a_airport IN (
+    SELECT DISTINCT flight.a_airport
+    FROM flight
+) AND flight.d_airport <> flight.a_airport
+GROUP BY flight.d_airport, flight.a_airport, flight_crew.jobtype;
+
+-- Query 5: Given an aircraft, what flights was it used on.
+SELECT flight.flightID, flight.d_airport, flight.a_airport
+FROM flight 
+WHERE flight.aircraft_sno = 5;
+
+-- Given an aircraft model, what flights was it used on.
+SELECT flight.flightID, flight.d_airport, flight.a_airport
+FROM flight 
+JOIN aircraft
+ON flight.aircraft_sno = aircraft.sno
+WHERE aircraft.model = 'A320';
+
+-- Query 6: Give information about flights arriving at or departing from a particular airport
+SELECT flight.flightID, flight.airline, flight.d_airport, flight.d_gate, flight.d_time, flight.a_airport, flight.a_gate, flight.a_time, aircraft.model
+FROM flight 
+JOIN aircraft
+ON flight.aircraft_sno = aircraft.sno
+WHERE flight.d_airport = "O'Hare International Airport" OR flight.a_airport = "O'Hare International Airport"
+ORDER BY flight.a_airport, flight.d_time;
+
+-- Query 7: For flights arriving at New York, what aircraft were used and what hangars were the planes kept in?
+
+SELECT flight.d_airport, flight.a_airport, flight.airline, aircraft.model, flight.aircraft_sno, undergoes_maintenance.hangarID
+FROM flight 
+INNER JOIN aircraft
+ON flight.aircraft_sno = aircraft.sno
+INNER JOIN undergoes_maintenance
+ON undergoes_maintenance.airport_name = flight.a_airport AND undergoes_maintenance.hangarID IN (
+    SELECT hangar.hangarID
+    FROM hangar
+    WHERE hangar.airport_name = "John F. Kennedy International Airport"
+) AND undergoes_maintenance.aircraft_sno = flight.aircraft_sno
+WHERE flight.a_airport = "John F. Kennedy International Airport";
+
+
+-- Query 8: Retrieve the phone number of the engineer(s) that specializes with a particular model given the FlightID. Retrieve the hangarID to inform the pilot of the location of the hangar.
+SELECT employee.phone_number, hangar.hangarID, hangar.location
+FROM flight 
+INNER JOIN aircraft
+ON flight.aircraft_sno = aircraft.sno
+INNER JOIN aircraft_model
+ON aircraft.model = aircraft_model.model
+INNER JOIN specialize_in
+ON aircraft_model.model = specialize_in.model
+INNER JOIN employee
+ON specialize_in.emp_ssn = employee.ssn
+INNER JOIN works_at
+ON works_at.airport_name = flight.a_airport AND works_at.hangarID IN (
+    SELECT hangar.hangarID
+    FROM hangar
+    WHERE hangar.airport_name = flight.a_airport
+) AND works_at.emp_ssn = employee.ssn
+INNER JOIN hangar
+ON works_at.airport_name = hangar.airport_name AND works_at.hangarID = hangar.hangarID
+WHERE flight.flightID = 'AA1301' AND employee.airport = flight.a_airport;
+
+-- Query 9: For each aircraft, what was the last flight it was flown on? Also, when was the last time it underwent maintenance?
+SELECT aircraft.sno, aircraft.model, flight.flightID, flight.d_time, MAX(undergoes_maintenance.date), undergoes_maintenance.maintenance_type
+FROM aircraft
+JOIN flight
+ON aircraft.sno = flight.aircraft_sno
+INNER JOIN undergoes_maintenance
+ON airport_name IN (
+    SELECT DISTINCT flight.d_airport
+    FROM flight
+) AND hangarID IN (
+    SELECT DISTINCT hangar.hangarID
+    FROM hangar
+) AND undergoes_maintenance.aircraft_sno = flight.aircraft_sno
+WHERE flight.a_time IN (
+    SELECT MAX(flight.a_time)
+    FROM flight
+    JOIN aircraft
+    ON aircraft.sno = flight.aircraft_sno
+    GROUP BY aircraft.sno
+)
+GROUP BY aircraft.sno;
+
+-- Query 10: List the aircraft that haven't been maintained since a particular date
+SELECT DISTINCT undergoes_maintenance.aircraft_sno, undergoes_maintenance.date
+FROM undergoes_maintenance
+WHERE undergoes_maintenance.date IN (
+    SELECT MAX(undergoes_maintenance.date)
+    FROM undergoes_maintenance
+    GROUP BY undergoes_maintenance.aircraft_sno
+) AND undergoes_maintenance.date < '2021-10-31'
+ORDER BY undergoes_maintenance.aircraft_sno;
+
+-- Query 11 : List most commonly used aircraft model + number of flights they were used in
+SELECT aircraft_model.model AS Model, aircraft_model.manufacturer AS Manufacturer, COUNT(*) AS Number_of_flights
+FROM aircraft_model
+INNER JOIN aircraft
+ON aircraft.model = aircraft_model.model
+INNER JOIN flight
+ON aircraft.sno = flight.aircraft_sno
+GROUP BY aircraft_model.model;
+
+-- Query 12: List the number of flights in a day, group by date and airline
+
+SELECT CAST(flight.d_time AS DATE), flight.airline, COUNT(*)
+FROM flight
+GROUP BY CAST(flight.d_time AS DATE), flight.airline;
+
+-- Query 13: List the number of flights in a day, group by date and aircraft model
+SELECT CAST(flight.d_time AS DATE), aircraft.model, COUNT(*)
+FROM flight
+INNER JOIN aircraft
+ON flight.aircraft_sno = aircraft.sno
+GROUP BY CAST(flight.d_time AS DATE), aircraft.model;

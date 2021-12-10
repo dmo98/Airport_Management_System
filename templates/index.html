@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Manager's Functionalities</title>
+	</head>
+	<body style="background-color: lightblue">
+        <center><h1>Manager's Functionalities</h1></center>
+		<br/>
+        <form method="POST" action="">
+            <center>
+            <H3> Contact Other Managers</H3> <br>
+            Airport <input type = "text" name= "airport" /> <br>
+            <input type = "submit" name="btn" value="Get Manager's Info">
+            </center>
+        </form>
+        <center>
+        <table>
+            <thead>
+			<tr>
+				<th>First Name</th>
+				<th>M</th>
+				<th>Last Name</th>
+                <th>Phone Number</th>
+                <th>Airport</th>
+			</tr>
+			</thead>
+            {% for item in manager_info %}
+            <tbody>
+            <tr>
+                <td>{{item[0]}}</td>
+                <td>{{item[1]}}</td>
+                <td>{{item[2]}}</td>
+                <td>{{item[3]}}</td>
+                <td>{{item[4]}}</td>
+                ...
+            </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+        </center>
+        <hr/>
+
+        <form method="POST" action="">
+            <center>
+            <H3> Average Experience of Cabin Crew on flights on a particular route</H3> <br>
+            Departure Airport <input type = "text" name= "d_airport" /> <br>
+            Arrival Airport <input type = "text" name= "a_airport" /> <br>
+            <input type = "submit" name="btn" value="Get Average Crew Experience On A Route">
+            </center>
+        </form>
+        <center>
+        <table>
+            <thead>
+			<tr>
+				<th>Departure Airport</th>
+				<th>Arrival Airport</th>
+				<th>Job Type</th>
+                <th>Average Experience (in years)</th>
+			</tr>
+			</thead>
+            {% for item in crew_experience %}
+            <tbody>
+            <tr>
+                <td>{{item[0]}}</td>
+                <td>{{item[1]}}</td>
+                <td>{{item[2]}}</td>
+                <td>{{item[3]}}</td>
+                ...
+            </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+        </center>
+        <hr/>
+
+        <form method="POST" action="">
+            <center>
+            <H3> What flights was an Aircraft used on?</H3> <br>
+            Aircraft Serial Number <input type = "text" name= "aircraft_sno" /> <br>
+            <input type = "submit" name="btn" value="Get Flights where this Aircraft was used">
+            </center>
+        </form>
+        <center>
+        <table>
+            <thead>
+			<tr>
+                <th>Flight ID</th>
+				<th>Departure Airport</th>
+				<th>Arrival Airport</th>
+
+			</tr>
+			</thead>
+            {% for item in aircraft_flights %}
+            <tbody>
+            <tr>
+                <td>{{item[0]}}</td>
+                <td>{{item[1]}}</td>
+                <td>{{item[2]}}</td>
+                ...
+            </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+        </center>
+        <hr/>
+
+        <form method="POST" action="">
+            <center>
+            <H3> What flights was an Aircraft Model used on?</H3> <br>
+            Aircraft Model <input type = "text" name= "aircraft_model" /> <br>
+            <input type = "submit" name="btn" value="Get Flights where this Aircraft Model was used">
+            </center>
+        </form>
+        <center>
+        <table>
+            <thead>
+			<tr>
+                <th>Flight ID</th>
+				<th>Departure Airport</th>
+				<th>Arrival Airport</th>
+
+			</tr>
+			</thead>
+            {% for item in aircraft_model_flights %}
+            <tbody>
+            <tr>
+                <td>{{item[0]}}</td>
+                <td>{{item[1]}}</td>
+                <td>{{item[2]}}</td>
+                ...
+            </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+        </center>
+        <hr/>
+
+        <form method="POST" action="">
+            <center>
+            <H3> Flights Departing From or Arriving At an Airport </H3> <br>
+            Airport <input type = "text" name= "airport" /> <br>
+            <input type = "submit" name="btn" value="Get Flights Departing From or Arriving At this Airport">
+            </center>
+        </form>
+        <center>
+        <table>
+            <thead>
+			<tr>
+                <th>Flight ID</th>
+                <th>Airline</th>
+				<th>Departure Airport</th>
+                <th>Departure Gate</th>
+                <th>Departure Time</th>
+				<th>Arrival Airport</th>
+                <th>Arrival Gate</th>
+                <th>Arrival Time</th>
+                <th>Model</th>
+
+			</tr>
+			</thead>
+            {% for item in airport_flights %}
+            <tbody>
+            <tr>
+                <td>{{item[0]}}</td>
+                <td>{{item[1]}}</td>
+                <td>{{item[2]}}</td>
+                <td>{{item[3]}}</td>
+                <td>{{item[4]}}</td>
+                <td>{{item[5]}}</td>
+                <td>{{item[6]}}</td>
+                <td>{{item[7]}}</td>
+                <td>{{item[8]}}</td>
+                ...
+            </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+        </center>
+        <hr/>
+
+        <form method="POST" action="">
+            <center>
+            <H3> For Flights Arriving at an Airport, what Aircraft were used and what Hangars were the planes kept in? </H3> <br>
+            Departure Airport <input type = "text" name= "d_airport" value = "All Airports"/> <br>
+            Arrival Airport <input type = "text" name= "a_airport"/> <br>
+            <input type = "submit" name="btn" value="Get Aircraft used for Flights Arriving At this Airport and Hangars they were kept in">
+            </center>
+        </form>
+        <center>
+        <table>
+            <thead>
+			<tr>
+				<th>Departure Airport</th>
+				<th>Arrival Airport</th>
+                <th>Aircraft Serial Number</th>
+                <th>Airline</th>
+                <th>Model</th>
+                <th>Hangar</th>
+
+			</tr>
+			</thead>
+            {% for item in aircrafts_and_hangars %}
+            <tbody>
+            <tr>
+                <td>{{item[0]}}</td>
+                <td>{{item[1]}}</td>
+                <td>{{item[2]}}</td>
+                <td>{{item[3]}}</td>
+                <td>{{item[4]}}</td>
+                <td>{{item[5]}}</td>
+                ...
+            </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+        </center>
+        <hr/>
+
+        <form method="POST" action="">
+            <center>
+            <H3> EMERGENCY: Get phone number of engineer who specializes in model of an aircraft having issues. Get HangarID to inform pilot to taxi to the location of the hangar </H3> <br>
+            Flight ID <input type = "text" name= "flightID" /> <br>
+            <input type = "submit" name="btn" value="Get Engineer's Phone Number and Hangar Location">
+            </center>
+        </form>
+        <center>
+        <table>
+            <thead>
+			<tr>
+				<th>Phone Number</th>
+				<th>Hangar ID</th>
+                <th>Hangar Location</th>
+
+			</tr>
+			</thead>
+            {% for item in emp_phonenum_and_hangar %}
+            <tbody>
+            <tr>
+                <td>{{item[0]}}</td>
+                <td>{{item[1]}}</td>
+                <td>{{item[2]}}</td>
+                ...
+            </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+        </center>
+        <hr/>
+
+        <form method="POST" action="">
+            <center>
+            <H3> Aircraft that haven't been maintained since a particular date </H3> <br>
+            Date of Last Maintenance<input type = "date" name= "date" /> <br>
+            <input type = "submit" name="btn" value="List Aircraft that haven't undergone maintenance since">
+            </center>
+        </form>
+        <center>
+        <table>
+            <thead>
+			<tr>
+				<th>Aircraft Serial Number</th>
+				<th>Last Maintenance Date</th>
+
+			</tr>
+			</thead>
+            {% for item in aircraft_maintenance %}
+            <tbody>
+            <tr>
+                <td>{{item[0]}}</td>
+                <td>{{item[1]}}</td>
+                ...
+            </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+        </center>
+        <hr/>
+
+        <form method="POST" action="">
+            <center>
+            <H3>Retrieve Information from Database</H3> <br>
+            <input type = "submit" name="btn" value="Go to Retrieval Page">
+            </center>
+        </form>
+
+		<hr/><hr/>
+        <footer>
+		<a href="../">Log Out</a>
+		</footer>
+	</body>
+</html>

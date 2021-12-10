@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Retrieval of Information from Airport Database</title>
+</head> 
+<body>
+    <center><h1>Retrieval Queries</h1></center>
+    <br/>
+    <form method="POST" action="">
+        <center>
+            <H3>Average Salary of Employees. Group by Airport, JobType</H3> <br>
+            <input type = "submit" name="btn" value="Get Average Employee Salary">
+        </center>
+    </form>
+    <center>
+        <table>
+            <thead>
+			<tr>
+				<th>Airport</th>
+				<th>Job Type</th>
+				<th>Average Salary</th>
+			</tr>
+			</thead>
+            {% for item in employee_salary %}
+            <tbody>
+            <tr>
+                <td>{{item[0]}}</td>
+                <td>{{item[1]}}</td>
+                <td>{{item[2]}}</td>
+                ...
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        </center>
+    <hr/>
+    <form method="POST" action="">
+        <center>
+            <H3>Average Experience of Flight Crew on each Flight</H3> <br>
+            <input type = "submit" name="btn" value="Get Average Crew Experience">
+        </center>
+    </form>
+    <center>
+        <table>
+            <thead>
+			<tr>
+				<th>Flight ID</th>
+				<th>Average Experience (in years)</th>
+			</tr>
+			</thead>
+            {% for item in crew_experience %}
+            <tbody>
+            <tr>
+                <td>{{item[0]}}</td>
+                <td>{{item[1]}}</td>
+                ...
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        </center>
+    <hr/>
+
+    <form method="POST" action="">
+        <center>
+            <H3> For each aircraft, return it's last flight and the last time it underwent maintenance </H3> <br>
+            <input type = "submit" name="btn" value="Get Last Flight and Maintenance">
+        </center>
+    </form>
+    <center>
+        <table>
+            <thead>
+			<tr>
+				<th>Aircraft Serial Number</th>
+				<th>Model</th>
+                <th>Flight ID</th>
+                <th>Departure Time</th>
+                <th>Last Date of Maintenance</th>
+                <th>Maintenance Type</th>
+
+			</tr>
+			</thead>
+            {% for item in aircraft_flight_and_maintenance %}
+            <tbody>
+            <tr>
+                <td>{{item[0]}}</td>
+                <td>{{item[1]}}</td>
+                <td>{{item[2]}}</td>
+                <td>{{item[3]}}</td>
+                <td>{{item[4]}}</td>
+                <td>{{item[5]}}</td>
+                ...
+            </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+        </center>
+        <hr/>
+
+    <form method="POST" action="">
+        <center>
+            <H3> Find most commonly used Aircraft Model </H3> <br>
+            <input type = "submit" name="btn" value="Get Most Common Aircraft Models">
+        </center>
+    </form>
+    <center>
+        <table>
+            <thead>
+			<tr>
+				<th>Manufacturer</th>
+				<th>Model</th>
+                <th>Number of Flights</th>
+
+			</tr>
+			</thead>
+            {% for item in common_aircraft_models %}
+            <tbody>
+            <tr>
+                <td>{{item[0]}}</td>
+                <td>{{item[1]}}</td>
+                <td>{{item[2]}}</td>
+                ...
+            </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+        </center>
+        <hr/>
+
+    <form method="POST" action="">
+        <center>
+            <H3> Find the number of flights in a day, group by airline </H3> <br>
+            <input type = "submit" name="btn" value="Get count of flights per day by airline">
+        </center>
+    </form>
+    <center>
+        <table>
+            <thead>
+			<tr>
+				<th>Date</th>
+				<th>Airline</th>
+                <th>Number of Flights</th>
+
+			</tr>
+			</thead>
+            {% for item in flights_count_airline %}
+            <tbody>
+            <tr>
+                <td>{{item[0]}}</td>
+                <td>{{item[1]}}</td>
+                <td>{{item[2]}}</td>
+                ...
+            </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+        </center>
+        <hr/>
+
+    <form method="POST" action="">
+        <center>
+            <H3> Find the number of flights in a day, group by aircraft model </H3> <br>
+            <input type = "submit" name="btn" value="Get count of flights per day by aircraft model">
+        </center>
+    </form>
+    <center>
+        <table>
+            <thead>
+			<tr>
+				<th>Date</th>
+				<th>Aircraft Model</th>
+                <th>Number of Flights</th>
+
+			</tr>
+			</thead>
+            {% for item in flights_count_aircraft_model %}
+            <tbody>
+            <tr>
+                <td>{{item[0]}}</td>
+                <td>{{item[1]}}</td>
+                <td>{{item[2]}}</td>
+                ...
+            </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+        </center>
+        <hr/>
+
+    <hr/><hr/>
+    <footer>
+        <a href="../index">Go Back</a>
+    </footer>
+</body>
+</html>
