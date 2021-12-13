@@ -8,4 +8,4 @@ This was done as a course project for CS 6400: Database Systems Concepts and Des
 4) Making an application. A simple interface was designed and the backend accesses the database and runs queries. Refer to 'app.py'.
 
 
-The goal of the project was to create a cool application, while improving my understanding of databases. I have made an Airport Management System, which displays certain functionalities that an Airport Manager would be in charge of. 
+The goal of the project was to create a cool application, while improving my understanding of databases. I have made an Airport Management System, which displays certain functionalities that an Airport Manager would be in charge of. The instructions for the set-up and demonstration of the functionalities of the application can be found in the 'instructions.pdf' file.
